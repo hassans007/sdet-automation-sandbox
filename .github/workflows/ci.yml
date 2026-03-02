@@ -1,0 +1,63 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      BASE_URL: http://localhost:3000
+      ADMIN_RESET_TOKEN: reset-token
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Start app stack
+        run: docker compose up -d --build
+
+      - name: Wait for health
+        run: |
+          for i in {1..30}; do
+            if curl -sSf http://localhost:3000/healthz > /dev/null; then
+              echo "healthy"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "app not healthy"
+          docker compose logs
+          exit 1
+
+      - name: API tests (Newman)
+        run: npm run test:api
+
+      - name: E2E tests (Playwright)
+        run: npm run test:e2e
+
+      - name: Docker logs
+        if: always()
+        run: docker compose logs > docker-logs.txt
+
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-artifacts
+          path: |
+            playwright-report
+            playwright
+            newman
+            docker-logs.txt

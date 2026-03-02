@@ -1,0 +1,30 @@
+{
+  "name": "sdet-automation-sandbox",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "dev": "node src/server.js",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:api": "newman run tests/api/postman_collection.json -e tests/api/postman_environment.json --reporters cli,junit,htmlextra --reporter-junit-export newman/junit.xml --reporter-htmlextra-export newman/report.html",
+    "lint:tests": "eslint tests --ext .ts",
+    "format:tests": "prettier --write tests/**/*.ts"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.12.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.47.0",
+    "@types/node": "^22.5.4",
+    "eslint": "^9.9.1",
+    "newman": "^6.1.0",
+    "newman-reporter-htmlextra": "^1.23.1",
+    "prettier": "^3.3.3",
+    "typescript": "^5.6.2"
+  }
+}
