@@ -1,17 +1,24 @@
-import { defineConfig } from "@playwright/test";
+import { Page, expect } from "@playwright/test";
 
-export default defineConfig({
-  testDir: "./tests/e2e",
-  retries: process.env.CI ? 1 : 0,
-  workers: process.env.CI ? 2 : undefined,
-  use: {
-    baseURL: process.env.BASE_URL || "http://localhost:3000",
-    trace: "on-first-retry",
-    screenshot: "only-on-failure",
-    video: "retain-on-failure",
-  },
-  reporter: [
-    ["html", { open: "never" }],
-    ["junit", { outputFile: "playwright/junit.xml" }],
-  ],
-});
+export class LoginPage {
+  constructor(private page: Page) {}
+
+  email = this.page.getByTestId("email");
+  password = this.page.getByTestId("password");
+  loginBtn = this.page.getByTestId("login-btn");
+  error = this.page.getByTestId("error");
+
+  async goto() {
+    await this.page.goto("/");
+  }
+
+  async login(email: string, password: string) {
+    await this.email.fill(email);
+    await this.password.fill(password);
+    await this.loginBtn.click();
+  }
+
+  async assertLoginFailed() {
+    await expect(this.error).toHaveText("Login failed");
+  }
+}
