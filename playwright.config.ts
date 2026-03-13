@@ -10,6 +10,12 @@ export default defineConfig({
     screenshot: "only-on-failure",
     video: "retain-on-failure",
   },
+  webServer: {
+    command: "node src/server.js",
+    url: "http://localhost:3000",
+    reuseExistingServer: !process.env.CI,
+    timeout: 10000,
+  },
   reporter: [
     ["html", { open: "never" }],
     ["junit", { outputFile: "playwright/junit.xml" }],
