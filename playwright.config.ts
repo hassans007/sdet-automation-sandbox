@@ -11,10 +11,12 @@ export default defineConfig({
     video: "retain-on-failure",
   },
   webServer: {
-    command: "node src/server.js",
-    url: "http://localhost:3000",
+    command: "docker-compose up --build --wait",
+    url: "http://localhost:3000/healthz",
     reuseExistingServer: !process.env.CI,
-    timeout: 10000,
+    timeout: 60000,
+    stdout: "pipe",
+    stderr: "pipe",
   },
   reporter: [
     ["html", { open: "never" }],
